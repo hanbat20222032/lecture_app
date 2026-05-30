@@ -248,11 +248,10 @@ class QuizPlayPanel(QWidget):
         self._show_card(0)
 
     def _show_card(self, idx: int):
-        # 카드 즉시 제거 (setParent(None) = 동기 삭제)
-        while self._card_lay.count():
-            item = self._card_lay.takeAt(0)
-            if item and item.widget():
-                item.widget().setParent(None)
+        # 카드 초기화
+        for i in reversed(range(self._card_lay.count())):
+            w = self._card_lay.itemAt(i).widget()
+            if w: w.deleteLater()
 
         if idx >= len(self._quizzes):
             self._finish()
@@ -263,7 +262,7 @@ class QuizPlayPanel(QWidget):
         card  = QuizCard(quiz, idx + 1, total)
         card.answered.connect(self._on_answered)
         self._card_lay.addWidget(card)
-        self._card_lay.addStretch()   # 카드를 위쪽으로 고정
+        self._card_lay.addStretch()
         self._prog_lbl.setText(f"{idx+1} / {total}")
         self._next_btn.setEnabled(False)
         self._next_btn.setText(
@@ -360,6 +359,7 @@ class QuizTab(QWidget):
         self._doc_list = QListWidget()
         self._doc_list.setToolTip("문서를 선택하세요. 같은 항목 클릭 시 선택 해제")
         self._doc_list.currentRowChanged.connect(self._on_doc_selected)
+        self._doc_list.itemClicked.connect(self._on_doc_item_clicked)
         ll.addWidget(self._doc_list, stretch=1)
 
         # 퀴즈 수 정보

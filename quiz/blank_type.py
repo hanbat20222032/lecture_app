@@ -97,15 +97,6 @@ def _is_good_sentence(sentence: str, keyword: str) -> bool:
     problem_starters = ("당신이", "여러분이", "다음과 같은 대학", "당신은", "다음을 보고")
     if any(sentence.startswith(p) or p in sentence[:20] for p in problem_starters):
         return False
-    # 속성 행 시작 문장 제외 (어느 개념인지 불명확)
-    _PROP_STARTERS = ("효과는", "정의는", "중요성은", "보안성은", "독립성은",
-                      "명확성은", "원칙은", "목적은", "핵심은", "구현은",)
-    if any(sentence.startswith(p) for p in _PROP_STARTERS):
-        return False
-    # 지시문으로 끝나는 문장 제외 ("설명하시오", "쓰시오" 등)
-    import re as _re2
-    if _re2.search(r"(하시오|쓰시오|설명하시오|구하시오|답하시오|나열하시오|서술하시오)[\.。]?\s*$", sentence.rstrip()):
-        return False
     return True
 
 

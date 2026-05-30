@@ -84,27 +84,6 @@ class QuizGenerator:
         if not sentences:
             sentences = [s.strip() for s in content.split('\n') if s.strip()]
 
-        # 문장이 너무 적으면 DB에서 파일 경로를 찾아 표 문장 직접 추출
-        # (이전 코드로 저장된 content에는 표 문장이 없을 수 있음)
-        if len(sentences) < 30:
-            try:
-                doc_row = db.get_document(doc_id)
-                if doc_row and doc_row.file_path:
-                    from pathlib import Path as _P
-                    fpath = _P(doc_row.file_path)
-                    if fpath.exists():
-                        from core.pdf_parser import PDFParser as _PP
-                        _parser = _PP(str(fpath))
-                        _parser._doc = __import__('fitz').open(str(fpath))
-                        extra = _parser._extract_table_sentences()
-                        _parser._doc.close()
-                        if extra:
-                            sentences.extend(extra)
-                            logger.info("표 문장 보충: %d개 추가 (총 %d개)",
-                                        len(extra), len(sentences))
-            except Exception as _e:
-                logger.debug("표 문장 보충 실패: %s", _e)
-
         # 키워드 단어 목록 (중요도 순)
         kw_words = [k.word for k in sorted(
             keywords, key=lambda k: k.combined_score, reverse=True

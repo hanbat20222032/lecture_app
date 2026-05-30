@@ -385,10 +385,26 @@ class PDFParser:
                             page_has_d = True
                     continue
 
-                # 컬럼 수 불일치 시 헤더/continuation 컨텍스트 해제
+                # ── 컬럼 수 불일치: 헤더 유지하면서 가능한 컬럼만 Pattern D 형식 출력 ──
                 if current_headers and len(cols) != len(current_headers):
-                    current_headers = None
-                    last_d_idx = -1
+                    # 숫자+영문명 구조이면 → 있는 컬럼까지 Pattern D 형식
+                    if (2 <= len(cols) <= len(current_headers)
+                            and _re.match(r"^\d+$", cols[0])
+                            and len(cols) >= 2
+                            and _re.match(r"^[A-Za-z]{3,}", cols[1])):
+                        avail = len(cols)
+                        parts = [f"{current_headers[i]}:{cols[i]}" for i in range(avail)]
+                        base = ", ".join(parts)
+                        sentence = f"{current_section} {base}" if current_section else base
+                        if 20 <= len(sentence) <= 300:
+                            results.append(sentence)
+                            last_d_idx = len(results) - 1
+                            page_has_d = True
+                        continue   # 헤더는 리셋하지 않고 유지
+                    # 그 외(헤더 없는 잡문)는 리셋
+                    else:
+                        current_headers = None
+                        last_d_idx = -1
 
                 # ── 패턴 A: [한국어, 영문, 한국어정의] ──
                 if (_re.match(r"^[\uAC00-\uD7A3]{2,6}$", subject)
@@ -416,18 +432,32 @@ class PDFParser:
                         if 20 <= len(s) <= 120:
                             results.append(s)
 
-                # ── 패턴 C: [숫자, 영문명, 한국어설명] ──
+                # ── 패턴 C: [숫자, 영문명, 한국어설명+나머지] ──
                 elif (_re.match(r"^\d+$", subject)
                         and len(cols) >= 3
                         and _re.match(r"^[A-Za-z]{4,20}$", cols[1])):
-                    eng = cols[1]
-                    defn = _clean_def(" ".join(cols[2:4]))
-                    if (len(defn) >= 8
-                            and _re.search(r"[\uAC00-\uD7A3]{3}", defn)
-                            and not _has_code(defn)):
-                        s = f"{eng}({subject}등급)은(는) {defn}이다."
-                        if 20 <= len(s) <= 120:
+                    # current_headers가 있으면 Pattern D 형식으로 통일
+                    if current_headers and 2 <= len(cols) <= len(current_headers):
+                        avail = min(len(cols), len(current_headers))
+                        parts = [
+                            f"{current_headers[i]}:{cols[i]}"
+                            for i in range(avail)
+                        ]
+                        base = ", ".join(parts)
+                        s = f"{current_section} {base}" if current_section else base
+                        if 20 <= len(s) <= 300:
                             results.append(s)
+                            last_d_idx = len(results) - 1
+                            page_has_d = True
+                    else:
+                        # 헤더 컨텍스트 없음 → 기존 형식
+                        defn = _clean_def(" ".join(cols[2:]))
+                        if (len(defn) >= 8
+                                and _re.search(r"[\uAC00-\uD7A3]{3}", defn)
+                                and not _has_code(defn)):
+                            s = f"{cols[1]}({subject}등급)은(는) {defn}이다."
+                            if 20 <= len(s) <= 200:
+                                results.append(s)
 
             # 이 페이지에서 패턴D/E가 사용됐으면 페이지 번호 기록
             if page_has_d:

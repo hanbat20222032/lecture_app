@@ -8,7 +8,6 @@ analysis/concept_extractor.py
 """
 
 from __future__ import annotations
-import re
 
 from dataclasses import dataclass
 from typing import Optional
@@ -150,35 +149,6 @@ class ConceptExtractor:
         freq_dict = processed.token_freq
         keywords: list[Keyword] = []
         for word, tf_score, tr_score, comb_score in combined:
-            # 언더스코어 복합 토큰 제외 (응집력_결합력 등 TF-IDF 아티팩트)
-            if "_" in word:
-                continue
-            # 연결된 한국어 토큰 제외 (5자+ 순수 한국어, 공백 없음)
-            # (높은응집력, 변경영향최소화 같은 복합 형태 차단)
-            if (len(word) >= 5
-                    and re.match(r"^[가-힣]+$", word)
-                    and " " not in word):
-                continue
-            # 이미 활용된 형태 제외 ("정의는", "높은" 등)
-            if re.search(r"(은|는|이|가|을|를|의|에|로|으로|와|과|도|만)$", word):
-                continue
-            # 숫자 포함 토큰 제외 ("1개", "300줄" 등)
-            if re.search(r"\d", word):
-                continue
-            # 영어 대소문자 혼합(CamelCase) 클래스명 제외
-            if re.search(r"[a-z][A-Z]|[A-Z]{2,}", word):
-                continue
-            # 8자+ 소문자 영어 식별자 제외 (paymentprocessor, userservice 등)
-            if re.match(r"^[a-z]{8,}$", word):
-                continue
-            # 의미 없는 단일 일반 명사 제외
-            _WEAK_KW = {"정의", "효과", "항목", "내용", "설명", "방법",
-                        "특징", "종류", "원칙", "비유", "중요성", "이점",
-                        "예시", "구현", "기준", "이름", "범위", "방향",
-                        "등급", "강도", "평가", "이유", "기호", "목적",
-                        "핵심", "장점", "방식", "과정", "역할", "형태"}
-            if word in _WEAK_KW:
-                continue
             keywords.append(Keyword(
                 document_id    = doc_id,
                 word           = word,

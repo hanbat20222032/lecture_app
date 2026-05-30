@@ -258,15 +258,6 @@ def get_documents_by_subject(subject_id: int) -> list[Document]:
     return [_row_to_document(r) for r in rows]
 
 
-def update_document_content(doc_id: int, new_content: str) -> None:
-    """문서의 content 필드를 갱신한다."""
-    with get_connection() as conn:
-        conn.execute(
-            "UPDATE documents SET content=? WHERE id=?",
-            (new_content, doc_id),
-        )
-
-
 def delete_document(doc_id: int) -> bool:
     with get_connection() as conn:
         conn.execute("DELETE FROM documents WHERE id=?", (doc_id,))

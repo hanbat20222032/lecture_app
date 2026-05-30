@@ -47,25 +47,6 @@ STOPWORDS_KO: frozenset[str] = frozenset({
 # 영어 불용어
 # ──────────────────────────────────────────────
 
-# 프로그래밍 언어 예약어 (코드 예제 PDF에서 키워드로 추출되는 것 방지)
-_PROG_KEYWORDS: frozenset[str] = frozenset({
-    "public","private","protected","static","void","class","int",
-    "string","return","new","this","true","false","null","final",
-    "abstract","interface","implements","extends","import","package",
-    "if","else","for","while","do","switch","case","break","continue",
-    "try","catch","throw","throws","finally","def","self","none",
-    "var","let","const","function","async","await","list","dict",
-    "float","double","long","char","byte","short","bool","obj","arr",
-    "lic","tic","str","num","ect",
-    # 일반 영어 단어
-    "user","users","db","stack","queue","list","node","data",
-    "repo","price","service","processor","factory","handler",
-    "manager","controller","helper","util","utils","config","app",
-    "coupling","cohesion","code","type","name","size","test",
-    "view","model","api","url","id","key","value","item",
-    "get","set","add","run","use","new","old","max","min",
-})
-
 STOPWORDS_EN: frozenset[str] = frozenset({
     # 관사
     "a", "an", "the",
@@ -130,4 +111,4 @@ def is_stopword(word: str, lang: str = "all") -> bool:
 def filter_tokens(tokens: list[str], lang: str = "all") -> list[str]:
     """토큰 리스트에서 불용어를 제거한다."""
     sw = get_stopwords(lang)
-    return [t for t in tokens if t.lower() not in sw and t.lower() not in _PROG_KEYWORDS and len(t) > 1]
+    return [t for t in tokens if t.lower() not in sw and len(t) > 1]

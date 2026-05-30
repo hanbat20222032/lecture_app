@@ -44,16 +44,13 @@ def _to_grade(score: float) -> str:
 def calculate_score(
     quiz_correct:    int,
     quiz_total:      int,
-    coverage_rate:   float = 0.0,   # 0~1  (0이면 미측정)
-    keyword_density: float = 0.0,   # 0~1  (0이면 미측정)
+    coverage_rate:   float,   # 0~1
+    keyword_density: float,   # 0~1
 ) -> ScoreBreakdown:
     """
     세 지표를 가중 합산하여 이해도 점수를 계산한다.
 
-    커버리지·밀도가 모두 0(미측정)이면 퀴즈 점수만으로 계산한다:
-        quiz_only: total = quiz_score  (단일 문서 퀴즈 모드)
-
-    가중치 (config.py) — 커버리지 측정 시:
+    가중치 (config.py):
         quiz_correct    60%
         coverage        30%
         keyword_density 10%
@@ -62,16 +59,12 @@ def calculate_score(
     coverage_pct = coverage_rate * 100
     density_pct  = keyword_density * 100
 
-    if coverage_rate == 0.0 and keyword_density == 0.0:
-        # 커버리지 미측정 → 퀴즈 점수를 그대로 최종 점수로 사용
-        total = round(quiz_pct, 2)
-    else:
-        total = (
-            SCORE_WEIGHTS["quiz_correct"]    * quiz_pct    +
-            SCORE_WEIGHTS["coverage"]        * coverage_pct +
-            SCORE_WEIGHTS["keyword_density"] * density_pct
-        )
-        total = round(min(max(total, 0.0), 100.0), 2)
+    total = (
+        SCORE_WEIGHTS["quiz_correct"]    * quiz_pct    +
+        SCORE_WEIGHTS["coverage"]        * coverage_pct +
+        SCORE_WEIGHTS["keyword_density"] * density_pct
+    )
+    total = round(min(max(total, 0.0), 100.0), 2)
 
     return ScoreBreakdown(
         quiz_score      = round(quiz_pct, 2),
