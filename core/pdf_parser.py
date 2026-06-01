@@ -314,23 +314,46 @@ class PDFParser:
             current_headers: list[str] | None = None   # 페이지별 헤더 추적
             page_has_d = False   # 이 페이지에서 패턴D/E 감지 여부
             last_d_idx = -1      # results에서 마지막 D/E 문장 인덱스 (continuation용)
+            last_d_cols: list[str] | None = None  # 마지막 D행의 컬럼값 (줄바꿈 병합용)
 
             for line in lines:
                 line_stripped = line.strip()
                 if not line_stripped:
                     last_d_idx = -1   # 빈 줄 → continuation 컨텍스트 종료
+                    last_d_cols = None
                     continue
 
                 # 다중 공백으로 컬럼 분리
                 cols = [c.strip() for c in _re.split(r"  +", line_stripped) if c.strip()]
 
+                # ── 단일 공백 헤더 행 보완 감지 ──────────────────
+                # PDF 폰트 특성상 컬럼 구분이 단일 공백일 때:
+                # "등급 이름 설명 예시 평가" → 1컬럼으로 오인 → 단어 분리 재시도
+                if len(cols) == 1 and len(line_stripped) <= 50:
+                    single_split = [c.strip() for c in line_stripped.split(" ") if c.strip()]
+                    if 2 <= len(single_split) <= 6 and _is_header_row(single_split):
+                        cols = single_split
+
                 # ── 연속 행(continuation) 처리 ────────────────────
-                # 직전이 D/E 행이고 현재가 짧은 단일 조각 → 마지막 컬럼에 이어붙임
+                # 직전이 D/E 행이고 현재가 짧은 단일 조각 → col2에 병합
                 if (len(cols) == 1
                         and last_d_idx >= 0
                         and last_d_idx == len(results) - 1
                         and 1 <= len(line_stripped) <= 25):
-                    results[last_d_idx] = results[last_d_idx] + " " + line_stripped
+                    if (last_d_cols is not None
+                            and current_headers is not None
+                            and len(last_d_cols) > 2):
+                        # col2(설명 컬럼)에 이어붙임
+                        last_d_cols[2] = last_d_cols[2] + line_stripped
+                        parts = [f"{current_headers[i]}:{last_d_cols[i]}"
+                                 for i in range(len(last_d_cols))]
+                        base = ", ".join(parts)
+                        sentence = f"{current_section} {base}" if current_section else base
+                        if len(sentence) <= 300:
+                            results[last_d_idx] = sentence
+                    else:
+                        # 헤더 없는 경우 기존 방식
+                        results[last_d_idx] = results[last_d_idx] + " " + line_stripped
                     continue
 
                 # ── 단일 컬럼 행: 섹션 제목 후보 ─────────────────
@@ -350,6 +373,33 @@ class PDFParser:
                     continue
 
                 subject = cols[0]
+
+                # ── 다중 컬럼 줄바꿈 연속 행 (헤더 탐지보다 먼저!) ──────────
+                # "기능을수행  변환" → _is_header_row가 가로채기 전에 처리
+                # 조건: 이전 D행 있음, 현재 행이 헤더보다 컬럼 수 적음,
+                #       첫 컬럼이 숫자·영문 아님, 모두 한국어
+                if (len(cols) >= 2
+                        and last_d_idx >= 0
+                        and last_d_idx == len(results) - 1
+                        and current_headers is not None
+                        and len(cols) < len(current_headers)
+                        and not _re.match(r'^\d+$', cols[0])
+                        and not _re.match(r'^[A-Za-z]', cols[0])
+                        and last_d_cols is not None
+                        and all(_re.search(r'[\uAC00-\uD7A3]', c) for c in cols)):
+                    # col2(설명)부터 순서대로 병합
+                    start_col = 2
+                    for i, cont in enumerate(cols):
+                        col_idx = start_col + i
+                        if col_idx < len(last_d_cols):
+                            last_d_cols[col_idx] = last_d_cols[col_idx] + cont
+                    parts = [f"{current_headers[i]}:{last_d_cols[i]}"
+                             for i in range(len(last_d_cols))]
+                    base = ", ".join(parts)
+                    sentence = f"{current_section} {base}" if current_section else base
+                    if len(sentence) <= 300:
+                        results[last_d_idx] = sentence
+                    continue   # current_headers 유지, 헤더 탐지 건너뜀
 
                 # ── 패턴 D/E: 헤더 행 탐지 ──────────────────
                 if _is_header_row(cols):
@@ -382,6 +432,7 @@ class PDFParser:
                         if 20 <= len(sentence) <= 300:
                             results.append(sentence)
                             last_d_idx = len(results) - 1
+                            last_d_cols = list(cols)   # 줄바꿈 병합용 저장
                             page_has_d = True
                     continue
 
@@ -450,13 +501,21 @@ class PDFParser:
                             last_d_idx = len(results) - 1
                             page_has_d = True
                     else:
-                        # 헤더 컨텍스트 없음 → 기존 형식
-                        defn = _clean_def(" ".join(cols[2:]))
+                        # 헤더 컨텍스트 없음 → 컬럼 수에 따라 형식 결정
+                        if len(cols) >= 5:
+                            # 5컬럼: [번호, 영문명, 설명, 예시, 평가] 형태
+                            desc  = _clean_def(cols[2])
+                            ex    = _clean_def(cols[3]) if len(cols) > 3 else ""
+                            grade = _clean_def(cols[4]) if len(cols) > 4 else ""
+                            parts = [p for p in [desc, ex, grade] if p and len(p) >= 2]
+                            defn  = ". ".join(parts)
+                        else:
+                            defn = _clean_def(" ".join(cols[2:]))
                         if (len(defn) >= 8
                                 and _re.search(r"[\uAC00-\uD7A3]{3}", defn)
                                 and not _has_code(defn)):
-                            s = f"{cols[1]}({subject}등급)은(는) {defn}이다."
-                            if 20 <= len(s) <= 200:
+                            s = f"{cols[1]}({subject}등급): {defn}"
+                            if 20 <= len(s) <= 300:
                                 results.append(s)
 
             # 이 페이지에서 패턴D/E가 사용됐으면 페이지 번호 기록
