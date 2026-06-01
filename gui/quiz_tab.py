@@ -204,14 +204,14 @@ class QuizPlayPanel(QWidget):
         self._lay.addWidget(self._prog_lbl)
 
         # 카드 영역 (스크롤)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea{border:none;background:transparent;}")
+        self._scroll = QScrollArea()
+        self._scroll.setWidgetResizable(True)
+        self._scroll.setStyleSheet("QScrollArea{border:none;background:transparent;}")
         self._card_container = QWidget()
         self._card_lay = QVBoxLayout(self._card_container)
         self._card_lay.setContentsMargins(0,0,0,0)
-        scroll.setWidget(self._card_container)
-        self._lay.addWidget(scroll, stretch=1)
+        self._scroll.setWidget(self._card_container)
+        self._lay.addWidget(self._scroll, stretch=1)
 
         # 하단 버튼 행 (나가기 + 다음)
         btn_row = QHBoxLayout(); btn_row.setSpacing(8)
@@ -248,10 +248,12 @@ class QuizPlayPanel(QWidget):
         self._show_card(0)
 
     def _show_card(self, idx: int):
-        # 카드 초기화
-        for i in reversed(range(self._card_lay.count())):
-            w = self._card_lay.itemAt(i).widget()
-            if w: w.deleteLater()
+        # 카드 초기화 - takeAt으로 위젯·스페이서 모두 제거
+        while self._card_lay.count():
+            item = self._card_lay.takeAt(0)
+            w = item.widget()
+            if w:
+                w.setParent(None)   # 즉시 제거 (deleteLater 지연 없음)
 
         if idx >= len(self._quizzes):
             self._finish()
@@ -268,6 +270,8 @@ class QuizPlayPanel(QWidget):
         self._next_btn.setText(
             "결과 보기 ▶" if idx == total - 1 else "다음 문제 ▶"
         )
+        # 새 카드마다 스크롤 맨 위로
+        self._scroll.verticalScrollBar().setValue(0)
 
     def _on_answered(self, user_ans: str):
         quiz = self._quizzes[self._current]
@@ -310,6 +314,7 @@ class QuizTab(QWidget):
         super().__init__(parent)
         self._subject_id: Optional[int] = None
         self._current_doc_id: Optional[int] = None
+        self._last_doc_id: Optional[int] = None   # 이전 클릭 doc_id (토글 감지용)
         self._session_id: Optional[int] = None
         self._current_quiz_type: str = 'all'   # 마지막 생성 타입
         self._build_ui()
@@ -439,6 +444,7 @@ class QuizTab(QWidget):
     # ── 문서 목록 ───────────────────────────
     def _refresh_docs(self):
         if not self._subject_id: return
+        self._last_doc_id = None   # 목록 갱신 시 이전 선택 초기화
         docs = db.get_documents_by_subject(self._subject_id)
         self._doc_list.clear()
         from PyQt6.QtWidgets import QListWidgetItem
@@ -452,8 +458,12 @@ class QuizTab(QWidget):
 
     def _on_doc_item_clicked(self, item):
         """이미 선택된 문서를 다시 클릭하면 선택 해제."""
-        row = self._doc_list.row(item)
-        if row == self._doc_list.currentRow() and item.isSelected():
+        doc_id = item.data(Qt.ItemDataRole.UserRole)
+        # currentRowChanged 가 먼저 실행되므로 currentRow 비교는 항상 True
+        # → 이전 클릭 doc_id(_last_doc_id)와 비교해야 정확한 재클릭 감지 가능
+        if doc_id == self._last_doc_id:
+            # 재클릭 → 선택 해제
+            self._last_doc_id = None
             self._doc_list.clearSelection()
             self._doc_list.setCurrentRow(-1)
             self._current_doc_id = None
@@ -462,6 +472,9 @@ class QuizTab(QWidget):
             self._start_btn.setEnabled(False)
             self._quiz_info.setText("문서를 선택하세요.")
             self._stack.setCurrentIndex(0)
+        else:
+            # 새 항목 클릭 → _last_doc_id 갱신 (다음 재클릭 감지용)
+            self._last_doc_id = doc_id
 
     def _on_doc_selected(self, row: int):
         item = self._doc_list.item(row)

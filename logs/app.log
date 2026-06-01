@@ -1,15 +1,56 @@
-2026-05-23 12:47:57  INFO      root                       로거 초기화 완료  |  레벨=INFO  |  파일=/home/claude/lecture_app/logs/app.log
-2026-05-23 12:47:57  INFO      database.db_manager        마이그레이션 실행: 001_initial.sql
-2026-05-23 12:47:57  INFO      database.db_manager        DB 초기화 완료: /home/claude/lecture_app/lecture_app.db
-2026-05-23 12:48:09  INFO      root                       로거 초기화 완료  |  레벨=INFO  |  파일=/home/claude/lecture_app/logs/app.log
-2026-05-23 12:48:09  INFO      database.db_manager        과목 생성: id=1  name=소프트웨어공학
-2026-05-23 12:48:09  INFO      database.db_manager        문서 저장: id=1  title=1주차 강의노트
-2026-05-23 12:48:09  INFO      database.db_manager        키워드 저장: 1개  document_id=1
-2026-05-23 12:48:09  INFO      database.db_manager        과목 삭제: id=1
-2026-05-30 10:11:34  INFO      root                       로거 초기화 완료  |  레벨=INFO  |  파일=C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\logs\app.log
-2026-05-30 10:11:34  INFO      __main__                   === 강의 이해도 측정기 v1.0.0 시작 ===
-2026-05-30 10:11:34  INFO      database.db_manager        마이그레이션 실행: 001_initial.sql
-2026-05-30 10:11:34  INFO      database.db_manager        DB 초기화 완료: C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\lecture_app.db
-2026-05-30 10:11:36  INFO      gui.main_window            메인 윈도우 초기화 완료
-2026-05-30 10:11:36  INFO      __main__                   메인 윈도우 표시 완료
-2026-05-30 10:11:42  INFO      gui.main_window            앱 종료
+2026-06-01 09:32:01  INFO      root                       로거 초기화 완료  |  레벨=INFO  |  파일=C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\logs\app.log
+2026-06-01 09:32:01  INFO      __main__                   === 강의 이해도 측정기 v1.0.0 시작 ===
+2026-06-01 09:32:01  INFO      database.db_manager        마이그레이션 실행: 001_initial.sql
+2026-06-01 09:32:01  INFO      database.db_manager        DB 초기화 완료: C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\lecture_app.db
+2026-06-01 09:32:01  INFO      gui.main_window            메인 윈도우 초기화 완료
+2026-06-01 09:32:02  INFO      __main__                   메인 윈도우 표시 완료
+2026-06-01 09:32:04  INFO      reports.report_gen         리포트 데이터 수집: doc_id=8  점수이력=2개  최신=15.0점
+2026-06-01 09:43:09  INFO      reports.report_gen         리포트 데이터 수집: doc_id=8  점수이력=2개  최신=15.0점
+2026-06-01 09:43:11  INFO      gui.main_window            앱 종료
+2026-06-01 13:43:47  INFO      root                       로거 초기화 완료  |  레벨=INFO  |  파일=C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\logs\app.log
+2026-06-01 13:43:47  INFO      __main__                   === 강의 이해도 측정기 v1.0.0 시작 ===
+2026-06-01 13:43:47  INFO      database.db_manager        마이그레이션 실행: 001_initial.sql
+2026-06-01 13:43:47  INFO      database.db_manager        DB 초기화 완료: C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\lecture_app.db
+2026-06-01 13:43:49  INFO      gui.main_window            메인 윈도우 초기화 완료
+2026-06-01 13:43:49  INFO      __main__                   메인 윈도우 표시 완료
+2026-06-01 13:43:56  INFO      gui.main_window            앱 종료
+2026-06-01 14:04:33  INFO      root                       로거 초기화 완료  |  레벨=INFO  |  파일=C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\logs\app.log
+2026-06-01 14:04:33  INFO      __main__                   === 강의 이해도 측정기 v1.0.0 시작 ===
+2026-06-01 14:04:33  INFO      database.db_manager        마이그레이션 실행: 001_initial.sql
+2026-06-01 14:04:33  INFO      database.db_manager        DB 초기화 완료: C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\lecture_app.db
+2026-06-01 14:04:34  INFO      gui.main_window            메인 윈도우 초기화 완료
+2026-06-01 14:04:34  INFO      __main__                   메인 윈도우 표시 완료
+2026-06-01 14:04:35  INFO      reports.report_gen         리포트 데이터 수집: doc_id=8  점수이력=2개  최신=15.0점
+2026-06-01 14:04:39  INFO      reports.report_gen         리포트 데이터 수집: doc_id=8  점수이력=2개  최신=15.0점
+2026-06-01 14:06:28  INFO      core.pdf_parser            PDF 파싱 시작: 네데통_14_TCP_IP.pdf
+2026-06-01 14:06:29  INFO      core.pdf_parser            PDF 파싱 완료: 40페이지  11580자  챕터 1개
+2026-06-01 14:06:29  INFO      database.db_manager        문서 저장: id=9  title=PowerPoint 프레젠테이션
+2026-06-01 14:06:29  INFO      gui.analysis_tab           PDF 문서 등록: id=9  pages=40  chars=11580
+2026-06-01 14:06:30  INFO      core.pdf_parser            PDF 파싱 시작: 네데통_14_TCP_IP.pdf
+2026-06-01 14:06:31  INFO      core.pdf_parser            PDF 파싱 완료: 40페이지  11580자  챕터 1개
+2026-06-01 14:06:31  INFO      analysis.concept_extractor  개념 추출 시작: doc_id=9  토큰=2014  문장=102
+2026-06-01 14:06:31  INFO      database.db_manager        키워드 저장: 50개  document_id=9
+2026-06-01 14:06:31  INFO      analysis.concept_extractor  개념 추출 완료: doc_id=9  키워드=50개  문장=5개
+2026-06-01 14:06:37  INFO      quiz.blank_type            빈칸 문제 생성: 10개 (요청=10)
+2026-06-01 14:06:37  INFO      quiz.ox_type               OX 문제 생성: 10개 (O=5 X=5)
+2026-06-01 14:06:37  INFO      database.db_manager        퀴즈 저장: 20개  document_id=9
+2026-06-01 14:06:37  INFO      quiz.generator             퀴즈 생성 완료: doc_id=9  빈칸=10  OX=10
+2026-06-01 14:07:17  INFO      database.db_manager        세션 완료: id=3  score=15.0
+2026-06-01 14:07:17  INFO      database.db_manager        이해도 저장: doc=9  chapter=전체  score=15.0
+2026-06-01 14:07:17  INFO      analysis.scorer            점수 저장: doc_id=9  total=15.0  grade=F
+2026-06-01 14:07:17  INFO      quiz.evaluator             세션 채점 완료: session_id=3  5/20  점수=15.0(F)
+2026-06-01 14:07:21  INFO      reports.report_gen         리포트 데이터 수집: doc_id=8  점수이력=2개  최신=15.0점
+2026-06-01 14:07:23  INFO      gui.main_window            앱 종료
+2026-06-01 14:26:44  INFO      root                       로거 초기화 완료  |  레벨=INFO  |  파일=C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\logs\app.log
+2026-06-01 14:26:44  INFO      __main__                   === 강의 이해도 측정기 v1.0.0 시작 ===
+2026-06-01 14:26:44  INFO      database.db_manager        마이그레이션 실행: 001_initial.sql
+2026-06-01 14:26:44  INFO      database.db_manager        DB 초기화 완료: C:\Users\dhdms\Desktop\소프트웨어 공학\lecture_app\lecture_app.db
+2026-06-01 14:26:45  INFO      gui.main_window            메인 윈도우 초기화 완료
+2026-06-01 14:26:45  INFO      __main__                   메인 윈도우 표시 완료
+2026-06-01 14:26:46  INFO      reports.report_gen         리포트 데이터 수집: doc_id=8  점수이력=2개  최신=15.0점
+2026-06-01 14:26:49  INFO      database.db_manager        과목 삭제: id=2
+2026-06-01 14:26:49  INFO      gui.main_window            과목 삭제: id=2  name=소프트웨어공학
+2026-06-01 14:26:49  INFO      reports.report_gen         리포트 데이터 수집: doc_id=9  점수이력=1개  최신=15.0점
+2026-06-01 14:26:51  INFO      database.db_manager        과목 삭제: id=1
+2026-06-01 14:26:51  INFO      gui.main_window            과목 삭제: id=1  name=네데통
+2026-06-01 14:26:53  INFO      gui.main_window            앱 종료

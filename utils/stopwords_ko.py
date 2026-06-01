@@ -112,3 +112,36 @@ def filter_tokens(tokens: list[str], lang: str = "all") -> list[str]:
     """토큰 리스트에서 불용어를 제거한다."""
     sw = get_stopwords(lang)
     return [t for t in tokens if t.lower() not in sw and len(t) > 1]
+
+
+# ──────────────────────────────────────────────
+# 프로그래밍 예약어 / 일반 영어 식별자
+# ──────────────────────────────────────────────
+
+_PROG_KEYWORDS: frozenset[str] = frozenset({
+    # Python 예약어
+    "false", "none", "true", "and", "as", "assert", "async", "await",
+    "break", "class", "continue", "def", "del", "elif", "else",
+    "except", "finally", "for", "from", "global", "if", "import",
+    "in", "is", "lambda", "nonlocal", "not", "or", "pass", "raise",
+    "return", "try", "while", "with", "yield",
+    # Java 예약어
+    "abstract", "boolean", "byte", "case", "catch", "char", "const",
+    "default", "do", "double", "enum", "extends", "final", "finally",
+    "float", "goto", "implements", "instanceof", "int", "interface",
+    "long", "native", "new", "package", "private", "protected",
+    "public", "short", "static", "strictfp", "super", "switch",
+    "synchronized", "this", "throw", "throws", "transient", "try",
+    "void", "volatile",
+    # 일반 영어 식별자 (코드에서 자주 쓰이나 학습 키워드 아님)
+    "get", "set", "add", "remove", "create", "delete", "update",
+    "init", "start", "stop", "run", "main", "test", "print",
+    "input", "output", "read", "write", "open", "close", "load",
+    "save", "send", "receive", "parse", "format", "convert", "check",
+    "find", "search", "sort", "filter", "map", "list", "dict",
+    "str", "int", "float", "bool", "type", "self", "cls", "obj",
+    "val", "var", "tmp", "buf", "idx", "num", "cnt", "len", "size",
+    "max", "min", "sum", "avg", "log", "err", "msg", "key", "value",
+    "data", "info", "name", "path", "file", "dir", "src", "dst",
+    "null", "true", "false", "undefined", "nan", "inf",
+})
