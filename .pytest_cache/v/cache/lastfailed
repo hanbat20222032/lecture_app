@@ -1,0 +1,3 @@
+{
+  "tests/test_analysis.py::TestCoverageCalc::test_empty_source": true
+}
