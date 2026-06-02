@@ -119,10 +119,15 @@ lecture_app/
 │   └── stopwords_ko.py      # 한국어·영어 불용어
 │
 └── tests/
-    ├── test_core.py         # core 단위 테스트 (40개)
-    ├── test_analysis.py     # analysis 단위 테스트 (26개)
-    ├── test_quiz.py         # quiz 단위 테스트 (25개)
-    └── test_gui.py          # GUI 초기화 테스트 (23개)
+    ├── __init__.py
+    ├── conftest.py
+    ├── test_stopwords.py
+    ├── test_text_processor.py
+    ├── test_tfidf.py
+    ├── test_quiz.py
+    ├── test_evaluator.py
+    ├── test_pdf_parser.py
+    └── test_gui.py
 ```
 
 ---
